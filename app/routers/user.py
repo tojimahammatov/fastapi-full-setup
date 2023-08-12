@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from .. import models, schemas, utils
 from ..database import get_db
+from ..oauth2 import get_current_user
 
 
 router = APIRouter(
@@ -27,8 +28,18 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
+@router.get("/", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
+async def get_user(current_user: models.User = Depends(get_current_user)):
+
+    # if not current_user:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"user with id={id} does not exist")
+    
+    return current_user
+
+
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
-async def get_user(id: int, db: Session = Depends(get_db)):
+async def get_user(id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     user = db.query(models.User).filter(models.User.id == id).first()
 
     if not user:
