@@ -29,7 +29,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
-async def get_user(current_user: models.User = Depends(get_current_user)):
+async def get_current_user(current_user: models.User = Depends(get_current_user)):
 
     # if not current_user:
     #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -39,7 +39,7 @@ async def get_user(current_user: models.User = Depends(get_current_user)):
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
-async def get_user(id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+async def get_user_by_id(id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     user = db.query(models.User).filter(models.User.id == id).first()
 
     if not user:
