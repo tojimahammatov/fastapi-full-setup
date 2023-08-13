@@ -27,20 +27,3 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Ses
     # generate JWT token
     access_token = create_access_token(data={"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=UserOut)
-async def signup(user: UserCreate, db: Session = Depends(get_db)):
-    _user = db.query(User).filter(User.email == user.email).first()
-    if _user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail=f"could not create a user")
-    
-    hashed_password = hash(user.password)
-    user.password = hashed_password
-    new_user = User(**user.model_dump())
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return new_user
